@@ -4,40 +4,42 @@ const Encrypt = require('../../Utils/encryption');
 
 module.exports = {
   createTeacher: async (req, res) => {
-    const { mgv, fullname } = req.body;
-    const hashPassword = await Encrypt.cryptPassword(mgv);
+    const { mgv, fullname } = req.body
+    const hashPassword = await Encrypt.cryptPassword(mgv)
     try {
-      const existUser = await Teacher.findOne({ mgv: mgv });
+      const existUser = await Teacher.findOne({ mgv: mgv })
       if (existUser) {
-        return res.status(400).json({ message: "Teacher already exists" });
+        return res.status(400).json({ message: "Teacher already exist" });
       }
       const newTeacher = await Teacher.create({
         mgv: mgv,
         fullname: fullname,
         isAdmin: false,
         isGV: true,
-        password: hashPassword,
-      });
-      res.status(200).json(newTeacher);
+        password: hashPassword
+      })
+      res.status(200).json(newTeacher)
     } catch (e) {
-      res.status(500).json({ message: "Error" });
+      res.status(500).json({ message: "Error" })
     }
   },
 
   getAll: async (req, res) => {
     try {
+      // Tìm tất cả giáo viên và populate trường classrooms
       const data = await Teacher.find({})
         .populate({
           path: 'classrooms',
-          select: '_id name', // Select necessary fields from classrooms
+          select: '_id name' // Chọn các trường cần thiết từ lớp học
         });
-
+  
       res.status(200).json({ data: data });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "Error", error: error.message });
     }
   },
+  
 
   getTeacher: async (req, res) => {
     const { teacherId } = req.params;
@@ -45,7 +47,7 @@ module.exports = {
       const teacher = await Teacher.findOne({ mgv: teacherId })
         .populate({
           path: 'classrooms',
-          select: '_id name',
+          select: '_id name'
         });
 
       if (!teacher) {
@@ -73,24 +75,34 @@ module.exports = {
   },
   
   updateTeacher: async (req, res, next) => {
-    const { teacherId } = req.params;
+    const { id } = req.params; // Make sure `id` is used here
     const { fullname } = req.body;
   
     try {
-      // Perform the update
-      const updatedTeacher = await Teacher.findOneAndUpdate(
-        { mgv: teacherId },
-        { fullname },
-        { new: true } // Return the updated document
-      );
-  
-      if (!updatedTeacher) {
-        throw new NotFoundError('No teacher found');
+      // Validate that `id` is not undefined or null
+      if (!id) {
+        return res.status(400).json({ message: 'Invalid ID' });
       }
   
-      res.status(200).json({ message: 'Update success', data: updatedTeacher });
+      const teacher = await Teacher.findById(id);
+      if (!teacher) {
+        throw new NotFoundError('Teacher not found');
+      }
+  
+      const updatedTeacher = await Teacher.findByIdAndUpdate(
+        id,
+        { $set: { fullname } },
+        { new: true } // Return the updated document
+      ).populate('classrooms');
+  
+      if (!updatedTeacher) {
+        throw new NotFoundError('Update failed');
+      }
+  
+      res.status(200).json({ message: 'Teacher updated successfully', data: updatedTeacher });
     } catch (error) {
-      next(error); // Pass the error to the error-handling middleware
+      next(error);
     }
-  },
+  },  
+  
 };
