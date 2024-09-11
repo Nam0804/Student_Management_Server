@@ -1,11 +1,11 @@
 const { Schema, model} = require('mongoose');
 
 const GradeSchema = new Schema({
-  // student: {
-  //   type: Schema.Types.ObjectId,
-  //   ref: 'User',
-  //   require: true
-  // },
+  student: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    require: true
+  },
   course: {
     type: Schema.Types.ObjectId,
     ref: 'Course',

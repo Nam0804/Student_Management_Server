@@ -7,7 +7,9 @@ const TeacherModel = new Schema({
     required: true,
     unique: true, // Đảm bảo mgv là duy nhất
   },
-  fullname: String,
+  fullname: {
+    type: String,
+  },
   password: String,
   isGV: Boolean,
   isAdmin: Boolean,

@@ -352,31 +352,6 @@ module.exports = {
     }
   },
   
-  getProfile: async (req, res) => {
-    try {
-      // `req.userId` được gán trong middleware sau khi xác thực token
-      const userId = req.userId;
-
-      // Tìm người dùng dựa trên userId
-      const user = await User.findById(userId);
-
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      // Trả về thông tin người dùng, ngoại trừ password
-      res.status(200).json({
-        name: user.name,
-        email: user.email,
-        msv: user.msv,
-        profilePicture: user.profilePicture || null,
-      });
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      res.status(500).json({ message: 'Server error' });
-    }
-  },
-
 
   restoreUser: async (req, res) => {
     const { msv } = req.body

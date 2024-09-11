@@ -3,8 +3,12 @@ const { Schema, model } = require("mongoose")
 
 const CourseSchema = new Schema({
   deleted: Boolean,
-  name: String,
-  code: String,
+  name: {
+    type: String,
+  },
+  code: {
+    type: String,
+  },
   credit: {
     type: Number,
   },
